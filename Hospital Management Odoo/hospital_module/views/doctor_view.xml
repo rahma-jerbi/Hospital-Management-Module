@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="doctor_tree" model="ir.ui.view">
+        <field name="name">kmhospital.doctor.tree</field>
+        <field name="model">kmhospital.doctor</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="address"/>
+                <field name="college"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="status"/>
+                <field name="age"/>
+                <field name="joined_from"/>
+                <field name="department_id"/>
+                <field name="view_appointment_ids"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="doctor_form" model="ir.ui.view">
+        <field name="name">kmhospital.doctor.form</field>
+        <field name="model">kmhospital.doctor</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="gender"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group>
+                            <field name="address"/>
+                            <field name="college"/>
+                            <field name="status"/>
+                            <field name="age"/>
+                            <field name="joined_from"/>
+                            <field name="image" widget='image' class='oe_avatar'/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="About">
+                            <field name='description'/>
+                        </page>
+                        <page string="Patient List" autofocus="autofocus">
+                            <group string="Total Appointments:">
+                                <h2>
+                                    <field name="total_appointments"/>
+                                </h2>
+                            </group>
+                            <field name='view_appointment_ids'/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="doctor_search" model="ir.ui.view">
+        <field name="name">kmhospital.doctor.search</field>
+        <field name="model">kmhospital.doctor</field>
+        <field name="arch" type="xml">
+            <search string="Doctor">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="status"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="age"/>
+                <field name="college"/>
+                <field name="department_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="doctor_action" model="ir.actions.act_window">
+        <field name="name">Doctors</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kmhospital.doctor</field>
+        <field name="view_mode">tree,form,search,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Doctors List
+            </p>
+        </field>
+    </record>
+
+    <record id="doctor_kanban" model="ir.ui.view">
+        <field name="name">kmhospital.doctor.kanban</field>
+        <field name="model">kmhospital.doctor</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="department_id">
+                <field name="name"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="status"/>
+                <field name="college"/>
+                <field name="department_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <h1 class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </h1>
+                                <ul>
+                                    <li>Gender :
+                                        <field name="gender"/>
+                                    </li>
+                                    <li>Phone :
+                                        <field name="phone"/>
+                                    </li>
+                                    <li>Email :
+                                        <field name="email"/>
+                                    </li>
+                                    <li>College :
+                                        <field name="college"/>
+                                    </li>
+                                    <li>Status :
+                                        <field name="status"/>
+                                    </li>
+                                    <li>Department :
+                                        <field name="department_id"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_halftime_confirm" model="ir.actions.server">
+        <field name="name">Confirm Parttime</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_kmhospital_doctor"/>
+        <field name="binding_model_id" ref="model_kmhospital_doctor"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_status_halftime()</field>
+    </record>
+
+    <record id="action_fulltime_confirm" model="ir.actions.server">
+        <field name="name">Confirm Fulltime</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_kmhospital_doctor"/>
+        <field name="binding_model_id" ref="model_kmhospital_doctor"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_status_fulltime()</field>
+    </record>
+
+    <menuitem id="hospital_doctor"
+              name="Doctors"
+              parent="hospital_root"
+              action="doctor_action"/>
+
+</odoo>

@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="appointment_tree" model="ir.ui.view">
+        <field name="name">kmhospital.appointment.tree</field>
+        <field name="model">kmhospital.appointment</field>
+        <field name="arch" type="xml">
+            <tree decoration-primary="status=='draft'" decoration-warning="status=='confirm'"
+                  decoration-success="status=='done'" decoration-danger="status=='cancel'">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="gender"/>
+                <field name="phone" groups="km_hospital.group_hospital_admin"/>
+                <field name="email"/>
+                <field name="age"/>
+                <field name="checkup_date"/>
+                <field name="status"/>
+                <field name="appointed_doctor_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="appointment_form" model="ir.ui.view">
+        <field name="name">kmhospital.appointment.form</field>
+        <field name="model">kmhospital.appointment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button id="button_confirm" name="action_status_confirm" string="Confirm" class="btn-warning"
+                            type="object"
+                            confirm="Are you sure you want to confirm?"/>
+                    <button id="button_done" name="action_status_done" string="Done" class="btn-success" type="object"
+                            confirm="Are you sure you want to set done?"/>
+                    <button id="button_cancel" name="action_status_cancel" string="Cancel" class="btn-danger"
+                            type="object" confirm="Are you sure you want to cancel?"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,confirm,done,cancel"
+                           options="{'clickable':'1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="patient_id"/>
+                            <field name="age"/>
+                            <field name="gender"/>
+                            <field name="phone" groups="km_hospital.group_hospital_admin"/>
+                            <field name="email"/>
+                        </group>
+                        <group>
+                            <field name="appointment_date"/>
+                            <field name="checkup_date"/>
+                            <field name="appointed_doctor_id"/>
+                            <field name="note" readonly="1" force_save="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Doctor prescription">
+                            <field name='description'/>
+                        </page>
+                        <page string="Medicine" name="medicine">
+                            <field name="prescription_medicine_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="name"/>
+                                        </group>
+                                        <group>
+                                            <field name="quantity"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Medical Test" name="medicaltest">
+                            <field name="prescription_medical_test_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="appointment_search" model="ir.ui.view">
+        <field name="name">kmhospital.appointment.search</field>
+        <field name="model">kmhospital.appointment</field>
+        <field name="arch" type="xml">
+            <search string="Appointment">
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="gender"/>
+                <field name="phone" groups="km_hospital.group_hospital_admin"/>
+                <field name="age"/>
+                <field name="status"/>
+                <field name="appointed_doctor_id"/>
+                <separator/>
+                <filter string="Male" name="male" domain="[('gender', '=', 'male')]"/>
+                <filter string="Female" name="female" domain="[('gender', '=', 'female')]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Status" name="state" context="{'group_by':'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="appointment_kanban" model="ir.ui.view">
+        <field name="name">kmhospital.appointment.kanban</field>
+        <field name="model">kmhospital.appointment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="status" decoration-warning="status=='draft'" decoration-danger="status=='done'"
+                    decoration-success="status=='confirmed'">
+                <field name="patient_id"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="status"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <h1 class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </h1>
+                                <ul>
+                                    <li>Name :
+                                        <field name="patient_id"/>
+                                    </li>
+                                    <li>Phone :
+                                        <field name="phone"/>
+                                    </li>
+                                    <li>Checkup date :
+                                        <field name="checkup_date"/>
+                                    </li>
+                                    <li>Status :
+                                        <field name="status"/>
+                                    </li>
+                                    <li>Appointed doctor:
+                                        <field name="appointed_doctor_id"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- calender view -->
+    <record id="appointment_view_calendar" model="ir.ui.view">
+        <field name="name">kmhospital.appointment.calendar</field>
+        <field name="model">kmhospital.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointments" date_start="appointment_date" date_stop="checkup_date"
+                      event_open_popup="true" mode="month" color="name" quick_add="False">
+                <field name="patient_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- pivot view -->
+    <record id="appointment_pivot" model="ir.ui.view">
+        <field name="name">kmhospital.appointment.pivot</field>
+        <field name="model">kmhospital.appointment</field>
+        <field name="arch" type="xml">
+            <pivot string="Appointments Pivot View">
+                <field name="patient_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="appointment_action" model="ir.actions.act_window">
+        <field name="name">Appointments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kmhospital.appointment</field>
+        <field name="view_mode">tree,form,search,kanban,calendar,pivot</field>
+        <field name="context">{}</field>
+        <!--for default group & filter => {'search_default_state': 1, 'search_default_male': 1}-->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create New Appointment
+            </p>
+        </field>
+    </record>
+
+    <record id="appointment_action_kids" model="ir.actions.act_window">
+        <field name="name">Kids Appointments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kmhospital.appointment</field>
+        <field name="view_mode">tree,form,search,kanban,calendar,pivot</field>
+        <field name="domain">[('age', '&lt;=', 10)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create New Appointment
+            </p>
+        </field>
+    </record>
+
+    <!-- action server for changing the status to confirmed -->
+    <record id="action_appointment_confirm" model="ir.actions.server">
+        <field name="name">Confirm appointment</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_kmhospital_appointment"/>
+        <field name="binding_model_id" ref="model_kmhospital_appointment"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_status_confirm()</field>
+    </record>
+
+    <!-- action server for changing the status to done -->
+    <record id="action_appointment_done" model="ir.actions.server">
+        <field name="name">Done appointment</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_kmhospital_appointment"/>
+        <field name="binding_model_id" ref="model_kmhospital_appointment"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">records.action_status_done()</field>
+    </record>
+
+    <menuitem id="hospital_appointment"
+              name="Appointments"
+              parent="hospital_root"/>
+
+    <menuitem id="all_appointment"
+              name="All Appointments"
+              parent="hospital_appointment"
+              action="appointment_action"/>
+
+    <menuitem id="kids_appointment"
+              name="Kids Appointments"
+              parent="hospital_appointment"
+              action="appointment_action_kids"/>
+
+    <menuitem id="print_patient_appointment"
+              name="Print Appointment"
+              parent="hospital_appointment"
+              action="action_report_appointment"/>
+
+    <menuitem id="create_patient_appointment"
+              name="Create Appointment"
+              parent="hospital_appointment"
+              action="action_create_patient_appointment"/>
+
+</odoo>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="patient_tree" model="ir.ui.view">
+        <field name="name">kmhospital.patient.tree</field>
+        <field name="model">kmhospital.patient</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="address"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="age"/>
+                <field name="patient_appointment_ids"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="patient_form" model="ir.ui.view">
+        <field name="name">kmhospital.patient.form</field>
+        <field name="model">kmhospital.patient</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_url" string="Open github" class="btn-primary" type="object"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="address"/>
+                            <field name="phone"/>
+                        </group>
+                        <group>
+                            <field name="gender" invisible="context.get('hide_gender')"/>
+                            <field name="email"/>
+                            <field name="age"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Appointments">
+                            <group string="No. of Appointments:">
+                                <h2>
+                                    <field name="total_appointments"/>
+                                </h2>
+                            </group>
+                            <field name="patient_appointment_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="patient_search" model="ir.ui.view">
+        <field name="name">kmhospital.patient.search</field>
+        <field name="model">kmhospital.patient</field>
+        <field name="arch" type="xml">
+            <search string="Patients">
+                <field name="name"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="age"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="patient_kanban" model="ir.ui.view">
+        <field name="name">kmhospital.patient.kanban</field>
+        <field name="model">kmhospital.patient</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="gender">
+                <field name="name"/>
+                <field name="gender"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <h1 class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </h1>
+                                <ul>
+                                    <li>Gender :
+                                        <field name="gender"/>
+                                    </li>
+                                    <li>Phone :
+                                        <field name="phone"/>
+                                    </li>
+                                    <li>Email :
+                                        <field name="email"/>
+                                    </li>
+                                    <li>Age :
+                                        <field name="age"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="all_patient_action" model="ir.actions.act_window">
+        <field name="name">All Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kmhospital.patient</field>
+        <field name="view_mode">tree,form,search,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Patients List
+            </p>
+        </field>
+    </record>
+
+    <record id="male_patient_action" model="ir.actions.act_window">
+        <field name="name">Male Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kmhospital.patient</field>
+        <field name="view_mode">tree,form,search,kanban</field>
+        <field name="context">{'default_gender' : 'male', 'hide_gender' : 1}</field>
+        <field name="domain">[('gender','=', 'male')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Patients List
+            </p>
+        </field>
+    </record>
+
+    <record id="female_patient_action" model="ir.actions.act_window">
+        <field name="name">Female Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">kmhospital.patient</field>
+        <field name="view_mode">tree,form,search,kanban</field>
+        <field name="context">{'default_gender' : 'female', 'hide_gender' : 1}</field>
+        <field name="domain">[('gender','=', 'female')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Patients List
+            </p>
+        </field>
+    </record>
+
+    <!-- action server for creating appointment from patient -->
+    <record id="action_create_appointment" model="ir.actions.server">
+        <field name="name">Create appointment</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="km_hospital.model_kmhospital_patient"/>
+        <field name="binding_model_id" ref="km_hospital.model_kmhospital_patient"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">
+            if record:
+                actions_values = env.ref('km_hospital.appointment_action').sudo().read()[0]
+                actions_values.update({'context': env.context})
+                action = actions_values
+        </field>
+    </record>
+
+    <!--  action sale hospital equipment  -->
+    <record id='action_product' model='ir.actions.act_window'>
+        <field name='name'>Hospital equipment</field>
+        <field name='res_model'>product.template</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <!--  action sales order  -->
+    <record id='action_sales' model='ir.actions.act_window'>
+        <field name='name'>Sales order</field>
+        <field name='res_model'>sale.order</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <menuitem id="hospital_root"
+              name="KM Hospital"
+              web_icon="km_hospital,static/description/icon.png"/>
+
+    <menuitem id="hospital_patient"
+              name="Patients"
+              parent="hospital_root"
+              groups="km_hospital.group_hospital_admin"
+              sequence='5'/>
+
+    <menuitem id="hospital_patient_all"
+              name="All Patients"
+              parent="hospital_patient"
+              action="all_patient_action"
+              sequence='6'/>
+
+    <menuitem id="hospital_patient_male"
+              name="Male Patients"
+              parent="hospital_patient"
+              action="male_patient_action"
+              sequence='7'/>
+
+    <menuitem id="hospital_patient_female"
+              name="Female Patients"
+              parent="hospital_patient"
+              action="female_patient_action"
+              sequence='8'/>
+
+    <menuitem
+            id='menu_product'
+            action='action_product'
+            name='Hospital equipment'
+            parent='hospital_root'
+            sequence='10'/>
+
+    <menuitem
+            id='menu_sales'
+            action='action_sales'
+            name='Sales order'
+            parent='hospital_root'
+            sequence='11'/>
+
+</odoo>
